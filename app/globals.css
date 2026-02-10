@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 200 80% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 15% 95%;
+    --secondary-foreground: 220 25% 10%;
+    --muted: 210 15% 93%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 173 60% 40%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 15% 88%;
+    --input: 210 15% 88%;
+    --ring: 200 80% 40%;
+    --chart-1: 200 80% 40%;
+    --chart-2: 173 60% 40%;
+    --chart-3: 220 25% 10%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.625rem;
+    --hero-bg: 220 25% 8%;
+    --hero-foreground: 210 20% 95%;
+    --hero-muted: 210 15% 70%;
+    --section-alt: 210 20% 96%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 200ms; }
+.stagger-4 { animation-delay: 300ms; }
+.stagger-5 { animation-delay: 400ms; }
+.stagger-6 { animation-delay: 500ms; }
+
+/* Animated grid background */
+@keyframes grid-scroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+.animated-grid {
+  background-image:
+    linear-gradient(hsl(200 80% 50% / 0.06) 1px, transparent 1px),
+    linear-gradient(to right, hsl(200 80% 50% / 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: grid-scroll 20s linear infinite;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: hsl(0 0% 100% / 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Animated border gradient */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-gradient {
+  to { --angle: 360deg; }
+}
+
+.animated-border {
+  background: conic-gradient(from var(--angle), hsl(200 80% 40% / 0.15), hsl(173 60% 40% / 0.15), hsl(200 80% 40% / 0.15)) border-box;
+  animation: rotate-gradient 8s linear infinite;
+}
+
+/* Floating orbs */
+@keyframes orb-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+@keyframes orb-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 25px) scale(0.95); }
+  66% { transform: translate(20px, -10px) scale(1.05); }
+}
+.orb-1 { animation: orb-float-1 12s ease-in-out infinite; }
+.orb-2 { animation: orb-float-2 15s ease-in-out infinite; }
+
+/* Typing cursor */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typing-cursor {
+  animation: blink-cursor 1s step-end infinite;
+}
