@@ -3,21 +3,45 @@
 import React from "react"
 import type { LangContent } from "@/lib/content"
 import { useState } from "react"
-import { ArrowRight, CheckCircle2, Globe, Mail, Shield } from "lucide-react"
+import { ArrowRight, CheckCircle2, Globe, Mail, Shield, AlertCircle } from "lucide-react"
 import { useAnimateIn } from "@/hooks/use-animate-in"
 
 export function FormSection({ content }: { content: LangContent }) {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { ref, isVisible } = useAnimateIn()
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    setError(null)
     setSubmitting(true)
-    setTimeout(() => {
-      setSubmitting(false)
+
+    const formData = new FormData(e.currentTarget)
+    const website = formData.get("website") as string
+    const email = formData.get("email") as string
+    const lang = content.lang
+
+    try {
+      const response = await fetch("/api/test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ website, email, lang }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit test")
+      }
+
       setSubmitted(true)
-    }, 1500)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -70,6 +94,12 @@ export function FormSection({ content }: { content: LangContent }) {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                {error && (
+                  <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
                 <div className="group">
                   <label
                     htmlFor="website"
