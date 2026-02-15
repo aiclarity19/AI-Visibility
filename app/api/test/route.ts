@@ -10,36 +10,89 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 type VisibilityResult = 'CLEAR' | 'PARTIAL' | 'NOT CLEAR'
 
+interface PillarScore {
+  name: string
+  score: number // 0-25
+  description: string
+}
+
 interface AnalysisResult {
   status: VisibilityResult
-  explanation: string[]
+  overallScore: number // 0-100
+  pillars: PillarScore[]
+  visibilityGaps: string[]
+  optimizationOpportunities: string[]
   businessDescription: string
   targetAudience: string
   location: string
 }
 
 async function analyzeWebsite(website: string): Promise<AnalysisResult> {
-  const prompt = `You are analyzing a website or business for AI visibility. Based on publicly available information about "${website}", answer these questions:
+  const prompt = `You are an AI visibility analyst using a structured methodology to evaluate how well AI tools can understand and recommend a business.
 
-1. What does this business do? (Be specific)
-2. Who is this business for? (Target audience)
-3. Where is this business located? (City/region if clear, or "Not clear")
+Analyze "${website}" based on publicly available information and evaluate it across 4 pillars (each worth 25 points, total 100):
 
-Then, classify the overall AI visibility as:
-- CLEAR: If you can clearly understand what the business does, who it's for, and where it operates
-- PARTIAL: If you understand some aspects but information is incomplete or unclear
-- NOT CLEAR: If you cannot determine what the business does, who it serves, or where it operates
+**Pillar 1: Business Clarity (25 points)**
+- How clearly is the business purpose, services, or products defined?
+- Is the value proposition obvious?
+- Score: 0-25 based on clarity
+
+**Pillar 2: Target Audience (25 points)**
+- How well-defined is the target customer or audience?
+- Is it clear who the business serves?
+- Score: 0-25 based on clarity
+
+**Pillar 3: Location/Service Area (25 points)**
+- Is the geographic location or service area clear?
+- Can AI determine where the business operates?
+- Score: 0-25 based on clarity
+
+**Pillar 4: Structured Data & AI Readability (25 points)**
+- How well-structured is the information for AI consumption?
+- Is key information easily accessible and parseable?
+- Score: 0-25 based on structure
+
+Calculate the overall score (sum of all 4 pillars, 0-100) and classify:
+- CLEAR: 75-100 points
+- PARTIAL: 40-74 points
+- NOT CLEAR: 0-39 points
+
+Identify specific visibility gaps (what's missing or unclear) and optimization opportunities (actionable steps to improve).
 
 Respond in JSON format:
 {
   "status": "CLEAR" | "PARTIAL" | "NOT CLEAR",
-  "businessDescription": "brief description",
-  "targetAudience": "brief description",
-  "location": "location or 'Not clear'",
-  "explanation": ["bullet point 1", "bullet point 2", "bullet point 3"]
+  "overallScore": 0-100,
+  "pillars": [
+    {
+      "name": "Business Clarity",
+      "score": 0-25,
+      "description": "brief explanation of score"
+    },
+    {
+      "name": "Target Audience",
+      "score": 0-25,
+      "description": "brief explanation of score"
+    },
+    {
+      "name": "Location/Service Area",
+      "score": 0-25,
+      "description": "brief explanation of score"
+    },
+    {
+      "name": "Structured Data & AI Readability",
+      "score": 0-25,
+      "description": "brief explanation of score"
+    }
+  ],
+  "visibilityGaps": ["gap 1", "gap 2", "gap 3"],
+  "optimizationOpportunities": ["opportunity 1", "opportunity 2", "opportunity 3"],
+  "businessDescription": "what the business does",
+  "targetAudience": "who it's for",
+  "location": "location or 'Not clear'"
 }
 
-Keep explanations concise (2-3 bullet points max).`
+Be specific and actionable. Focus on what's missing and what can be improved.`
 
   try {
     const completion = await openai.chat.completions.create({
@@ -65,9 +118,37 @@ Keep explanations concise (2-3 bullet points max).`
 
     const result = JSON.parse(content) as AnalysisResult
     
-    // Validate status
+    // Validate and normalize result
     if (!['CLEAR', 'PARTIAL', 'NOT CLEAR'].includes(result.status)) {
       result.status = 'NOT CLEAR'
+    }
+
+    // Ensure overallScore is valid (0-100)
+    if (typeof result.overallScore !== 'number' || result.overallScore < 0 || result.overallScore > 100) {
+      // Recalculate from pillars if available
+      if (result.pillars && Array.isArray(result.pillars)) {
+        result.overallScore = result.pillars.reduce((sum, pillar) => sum + (pillar.score || 0), 0)
+      } else {
+        result.overallScore = 0
+      }
+    }
+
+    // Ensure pillars array exists and has 4 items
+    if (!result.pillars || !Array.isArray(result.pillars) || result.pillars.length !== 4) {
+      result.pillars = [
+        { name: 'Business Clarity', score: 0, description: 'Unable to assess' },
+        { name: 'Target Audience', score: 0, description: 'Unable to assess' },
+        { name: 'Location/Service Area', score: 0, description: 'Unable to assess' },
+        { name: 'Structured Data & AI Readability', score: 0, description: 'Unable to assess' },
+      ]
+    }
+
+    // Ensure arrays exist
+    if (!result.visibilityGaps || !Array.isArray(result.visibilityGaps)) {
+      result.visibilityGaps = ['Unable to identify specific gaps']
+    }
+    if (!result.optimizationOpportunities || !Array.isArray(result.optimizationOpportunities)) {
+      result.optimizationOpportunities = ['Consider improving your online presence']
     }
 
     return result
@@ -76,10 +157,21 @@ Keep explanations concise (2-3 bullet points max).`
     // Fallback result
     return {
       status: 'NOT CLEAR',
-      explanation: [
+      overallScore: 0,
+      pillars: [
+        { name: 'Business Clarity', score: 0, description: 'Unable to analyze automatically' },
+        { name: 'Target Audience', score: 0, description: 'Unable to analyze automatically' },
+        { name: 'Location/Service Area', score: 0, description: 'Unable to analyze automatically' },
+        { name: 'Structured Data & AI Readability', score: 0, description: 'Unable to analyze automatically' },
+      ],
+      visibilityGaps: [
         'Unable to analyze the website automatically',
-        'This may indicate the business information is not easily accessible to AI tools',
-        'Consider improving your online presence and structured data',
+        'Business information may not be easily accessible to AI tools',
+      ],
+      optimizationOpportunities: [
+        'Improve online presence and structured data',
+        'Ensure key business information is clearly stated',
+        'Add structured data markup (Schema.org)',
       ],
       businessDescription: 'Could not determine',
       targetAudience: 'Could not determine',
@@ -99,6 +191,18 @@ function getStatusColor(status: VisibilityResult): string {
     default:
       return '#6b7280'
   }
+}
+
+function getScoreColor(score: number): string {
+  if (score >= 75) return '#10b981' // emerald
+  if (score >= 40) return '#f59e0b' // amber
+  return '#ef4444' // red
+}
+
+function getPillarColor(score: number): string {
+  if (score >= 20) return '#10b981' // emerald
+  if (score >= 10) return '#f59e0b' // amber
+  return '#ef4444' // red
 }
 
 function getStatusLabel(status: VisibilityResult, lang: 'en' | 'pt'): string {
@@ -123,12 +227,39 @@ async function sendEmail(
 ) {
   const statusColor = getStatusColor(result.status)
   const statusLabel = getStatusLabel(result.status, lang)
+  const scoreColor = getScoreColor(result.overallScore)
 
   const isPT = lang === 'pt'
 
   const subject = isPT
-    ? 'Seu Resultado de Visibilidade IA'
-    : 'Your AI Visibility Result'
+    ? `Seu Resultado de Visibilidade IA: ${result.overallScore}/100`
+    : `Your AI Visibility Result: ${result.overallScore}/100`
+
+  // Build pillar HTML
+  const pillarsHtml = result.pillars.map((pillar) => {
+    const pillarColor = getPillarColor(pillar.score)
+    return `
+      <div style="margin-bottom: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 4px solid ${pillarColor};">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4 style="margin: 0; color: #1f2937; font-size: 15px; font-weight: 600;">${pillar.name}</h4>
+          <span style="background: ${pillarColor}; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600; font-size: 14px;">
+            ${pillar.score}/25
+          </span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 13px;">${pillar.description}</p>
+      </div>
+    `
+  }).join('')
+
+  // Build visibility gaps HTML
+  const gapsHtml = result.visibilityGaps.map((gap) => `
+    <li style="margin-bottom: 8px; color: #4b5563;">${gap}</li>
+  `).join('')
+
+  // Build optimization opportunities HTML
+  const opportunitiesHtml = result.optimizationOpportunities.map((opp) => `
+    <li style="margin-bottom: 8px; color: #4b5563;">${opp}</li>
+  `).join('')
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -137,65 +268,105 @@ async function sendEmail(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background: #f3f4f6;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
     <h1 style="color: white; margin: 0; font-size: 24px;">${isPT ? 'AI Visibility' : 'AI Visibility'}</h1>
   </div>
   
   <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-    <h2 style="color: #1f2937; margin-top: 0;">${isPT ? 'Seu Resultado de Visibilidade IA' : 'Your AI Visibility Result'}</h2>
+    <h2 style="color: #1f2937; margin-top: 0; font-size: 22px;">${isPT ? 'Seu Resultado de Visibilidade IA' : 'Your AI Visibility Result'}</h2>
     
-    <p style="color: #6b7280;">
+    <p style="color: #6b7280; margin-bottom: 24px;">
       ${isPT 
-        ? `Analisamos "${website}" para entender como ferramentas de IA interpretam sua empresa.`
-        : `We analyzed "${website}" to understand how AI tools interpret your business.`
+        ? `Analisamos "${website}" usando nossa metodologia estruturada de 4 pilares para avaliar como ferramentas de IA interpretam sua empresa.`
+        : `We analyzed "${website}" using our structured 4-pillar methodology to evaluate how AI tools interpret your business.`
       }
     </p>
     
-    <div style="background: #f9fafb; border-left: 4px solid ${statusColor}; padding: 20px; margin: 20px 0; border-radius: 4px;">
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <span style="background: ${statusColor}; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">
-          ${statusLabel}
+    <!-- Overall Score -->
+    <div style="background: linear-gradient(135deg, ${scoreColor}15 0%, ${scoreColor}05 100%); border: 2px solid ${scoreColor}; padding: 24px; margin: 24px 0; border-radius: 12px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <span style="font-size: 48px; font-weight: 700; color: ${scoreColor}; line-height: 1;">
+          ${result.overallScore}
         </span>
+        <span style="font-size: 24px; color: #6b7280; font-weight: 500;">/100</span>
       </div>
-      <p style="margin: 0; color: #374151; font-size: 14px;">
-        ${isPT
-          ? 'Status de visibilidade para ferramentas de IA'
-          : 'AI visibility status'
-        }
+      <div style="display: inline-block; background: ${statusColor}; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; margin-top: 8px;">
+        ${statusLabel}
+      </div>
+      <p style="margin: 12px 0 0 0; color: #6b7280; font-size: 14px;">
+        ${isPT ? 'Pontuação Geral de Visibilidade IA' : 'Overall AI Visibility Score'}
       </p>
     </div>
-    
-    <div style="margin: 24px 0;">
-      <h3 style="color: #1f2937; font-size: 16px; margin-bottom: 12px;">${isPT ? 'Análise' : 'Analysis'}</h3>
-      <ul style="color: #4b5563; padding-left: 20px; margin: 0;">
-        ${result.explanation.map((point) => `<li style="margin-bottom: 8px;">${point}</li>`).join('')}
+
+    <!-- Pillar Breakdown -->
+    <div style="margin: 32px 0;">
+      <h3 style="color: #1f2937; font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">
+        ${isPT ? 'Análise por Pilares (4 x 25 pontos)' : 'Pillar Breakdown (4 x 25 points)'}
+      </h3>
+      ${pillarsHtml}
+    </div>
+
+    <!-- Visibility Gaps -->
+    <div style="margin: 32px 0; padding: 20px; background: #fef2f2; border-left: 4px solid #ef4444; border-radius: 8px;">
+      <h3 style="color: #991b1b; font-size: 16px; font-weight: 600; margin-top: 0; margin-bottom: 12px;">
+        ${isPT ? '🔍 Lacunas de Visibilidade Identificadas' : '🔍 Visibility Gaps Identified'}
+      </h3>
+      <ul style="margin: 0; padding-left: 20px; color: #7f1d1d;">
+        ${gapsHtml}
       </ul>
     </div>
-    
+
+    <!-- Optimization Opportunities -->
+    <div style="margin: 32px 0; padding: 20px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px;">
+      <h3 style="color: #065f46; font-size: 16px; font-weight: 600; margin-top: 0; margin-bottom: 12px;">
+        ${isPT ? '🚀 Oportunidades de Otimização' : '🚀 Optimization Opportunities'}
+      </h3>
+      <ul style="margin: 0; padding-left: 20px; color: #047857;">
+        ${opportunitiesHtml}
+      </ul>
+    </div>
+
+    <!-- What AI Understood -->
     <div style="background: #f3f4f6; padding: 16px; border-radius: 6px; margin: 24px 0;">
-      <p style="margin: 0; font-size: 13px; color: #6b7280;">
-        <strong>${isPT ? 'O que a IA entendeu:' : 'What AI understood:'}</strong><br>
-        ${isPT ? 'Negócio:' : 'Business:'} ${result.businessDescription}<br>
-        ${isPT ? 'Público-alvo:' : 'Target audience:'} ${result.targetAudience}<br>
-        ${isPT ? 'Localização:' : 'Location:'} ${result.location}
+      <h4 style="color: #1f2937; font-size: 14px; font-weight: 600; margin-top: 0; margin-bottom: 12px;">
+        ${isPT ? 'O que a IA entendeu:' : 'What AI understood:'}
+      </h4>
+      <p style="margin: 4px 0; font-size: 13px; color: #6b7280;">
+        <strong>${isPT ? 'Negócio:' : 'Business:'}</strong> ${result.businessDescription}
+      </p>
+      <p style="margin: 4px 0; font-size: 13px; color: #6b7280;">
+        <strong>${isPT ? 'Público-alvo:' : 'Target audience:'}</strong> ${result.targetAudience}
+      </p>
+      <p style="margin: 4px 0; font-size: 13px; color: #6b7280;">
+        <strong>${isPT ? 'Localização:' : 'Location:'}</strong> ${result.location}
       </p>
     </div>
     
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-      <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
+    <!-- Strong CTA -->
+    <div style="margin-top: 40px; padding: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; text-align: center;">
+      <h3 style="color: white; font-size: 20px; font-weight: 600; margin-top: 0; margin-bottom: 12px;">
+        ${isPT 
+          ? 'Quer aumentar sua pontuação?'
+          : 'Want to improve your score?'
+        }
+      </h3>
+      <p style="color: rgba(255, 255, 255, 0.9); font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
         ${isPT
-          ? 'Quer uma análise mais detalhada? Podemos ajudar você a melhorar sua visibilidade para ferramentas de IA.'
-          : 'Want a deeper analysis? We can help you improve your visibility to AI tools.'
+          ? 'Nossa auditoria completa de visibilidade IA inclui análise detalhada, comparação competitiva, roadmap personalizado de melhorias e implementação de otimizações. Veja como sua empresa pode alcançar 90+ pontos.'
+          : 'Our complete AI visibility audit includes detailed analysis, competitive comparison, personalized improvement roadmap, and optimization implementation. See how your business can reach 90+ points.'
         }
       </p>
       <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}" 
-         style="display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">
-        ${isPT ? 'Solicitar Auditoria Gratuita' : 'Request Free Audit'}
+         style="display: inline-block; background: white; color: #667eea; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        ${isPT ? 'Solicitar Auditoria Completa' : 'Request Complete Audit'}
       </a>
+      <p style="color: rgba(255, 255, 255, 0.8); font-size: 12px; margin-top: 16px; margin-bottom: 0;">
+        ${isPT ? 'Gratuita • Sem compromisso • Resultados em 48h' : 'Free • No commitment • Results in 48h'}
+      </p>
     </div>
     
-    <p style="margin-top: 30px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+    <p style="margin-top: 30px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
       ${isPT
         ? 'Este resultado é um sinal indicativo baseado na interpretação da IA. Não garante posicionamento em respostas geradas por IA.'
         : 'This result is an indicative signal based on AI interpretation. It does not guarantee placement in AI-generated responses.'
@@ -237,6 +408,8 @@ async function logToSheets(
         website,
         email,
         status: result.status,
+        overallScore: result.overallScore,
+        pillarScores: result.pillars.map(p => `${p.name}: ${p.score}/25`).join(', '),
         timestamp: new Date().toISOString(),
       }),
     })
