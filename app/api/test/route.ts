@@ -246,7 +246,55 @@ async function logToSheets(
   }
 }
 
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://www.aiclarity.online',
+  'https://aiclarity.online',
+]
+
+function isOriginAllowed(origin: string | null): boolean {
+  if (!origin) return false
+  return ALLOWED_ORIGINS.some(allowed => origin.startsWith(allowed))
+}
+
+// Handle CORS preflight requests
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  
+  if (isOriginAllowed(origin)) {
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': origin || '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '86400',
+      },
+    })
+  }
+  
+  return new NextResponse(null, { status: 403 })
+}
+
 export async function POST(request: NextRequest) {
+  // Check origin/referer
+  const origin = request.headers.get('origin')
+  const referer = request.headers.get('referer')
+  
+  // Allow if:
+  // 1. Origin header matches allowed origins (cross-origin requests)
+  // 2. Referer matches allowed domains (same-origin requests from https://www.aiclarity.online/en or /en#test)
+  const isAllowed = 
+    isOriginAllowed(origin) || 
+    (referer && ALLOWED_ORIGINS.some(allowed => referer.startsWith(allowed)))
+  
+  if (!isAllowed) {
+    return NextResponse.json(
+      { error: 'Origin not allowed' },
+      { status: 403 }
+    )
+  }
+
   try {
     const body = await request.json()
     const { website, email, lang = 'en' } = body
@@ -280,16 +328,34 @@ export async function POST(request: NextRequest) {
       // Already logged, continue
     })
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Test submitted successfully',
     })
+    
+    // Add CORS headers
+    if (origin && isOriginAllowed(origin)) {
+      response.headers.set('Access-Control-Allow-Origin', origin)
+      response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type')
+    }
+    
+    return response
   } catch (error) {
     console.error('API error:', error)
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
+    
+    // Add CORS headers to error response too
+    if (origin && isOriginAllowed(origin)) {
+      errorResponse.headers.set('Access-Control-Allow-Origin', origin)
+      errorResponse.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+      errorResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type')
+    }
+    
+    return errorResponse
   }
 }
 
