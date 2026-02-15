@@ -235,9 +235,48 @@ async function sendEmail(
     ? `Seu Resultado de Visibilidade IA: ${result.overallScore}/100`
     : `Your AI Visibility Result: ${result.overallScore}/100`
 
-  // Build pillar HTML
+  // Get score positioning message
+  const getScorePositioning = (score: number, isPT: boolean): string => {
+    if (score >= 75) {
+      return isPT
+        ? 'Sua base é sólida, mas oportunidades de visibilidade estão sendo deixadas de lado.'
+        : 'Your foundation is strong, but visibility opportunities are being left on the table.'
+    } else if (score >= 40) {
+      return isPT
+        ? 'Há potencial significativo para melhorar sua visibilidade para ferramentas de IA.'
+        : 'There is significant potential to improve your visibility to AI tools.'
+    } else {
+      return isPT
+        ? 'Sua visibilidade para IA precisa de melhorias estruturais urgentes.'
+        : 'Your AI visibility requires urgent structural improvements.'
+    }
+  }
+
+  // Build pillar HTML with opportunity-driven language
   const pillarsHtml = result.pillars.map((pillar) => {
     const pillarColor = getPillarColor(pillar.score)
+    // Transform description to be more strategic
+    let strategicDescription = pillar.description
+    if (pillar.score < 20) {
+      if (pillar.name === 'Target Audience') {
+        strategicDescription = isPT
+          ? 'Refinar a segmentação de audiência pode aumentar a precisão da interpretação pela IA.'
+          : 'Refining audience segmentation could increase AI interpretation precision.'
+      } else if (pillar.name === 'Structured Data & AI Readability') {
+        strategicDescription = isPT
+          ? 'Melhorar dados estruturados pode aumentar a legibilidade por máquinas e a probabilidade de citação pela IA.'
+          : 'Enhancing structured data could improve machine-readability and AI citation likelihood.'
+      } else if (pillar.name === 'Business Clarity') {
+        strategicDescription = isPT
+          ? 'Clarificar a proposta de valor pode melhorar significativamente a compreensão pela IA.'
+          : 'Clarifying value proposition could significantly improve AI comprehension.'
+      } else if (pillar.name === 'Location/Service Area') {
+        strategicDescription = isPT
+          ? 'Definir claramente a área de serviço pode aumentar a relevância geográfica para ferramentas de IA.'
+          : 'Clearly defining service area could increase geographic relevance for AI tools.'
+      }
+    }
+    
     return `
       <div style="margin-bottom: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 4px solid ${pillarColor};">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -246,7 +285,7 @@ async function sendEmail(
             ${pillar.score}/25
           </span>
         </div>
-        <p style="margin: 0; color: #6b7280; font-size: 13px;">${pillar.description}</p>
+        <p style="margin: 0; color: #6b7280; font-size: 13px;">${strategicDescription}</p>
       </div>
     `
   }).join('')
@@ -296,6 +335,20 @@ async function sendEmail(
       </div>
       <p style="margin: 12px 0 0 0; color: #6b7280; font-size: 14px;">
         ${isPT ? 'Pontuação Geral de Visibilidade IA' : 'Overall AI Visibility Score'}
+      </p>
+      <p style="margin: 16px 0 0 0; color: #4b5563; font-size: 14px; font-style: italic; font-weight: 500;">
+        ${getScorePositioning(result.overallScore, isPT)}
+      </p>
+    </div>
+
+    <!-- Competitive Framing -->
+    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 8px;">
+      <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+        <strong>${isPT ? '💡 Contexto Competitivo:' : '💡 Competitive Context:'}</strong><br>
+        ${isPT
+          ? 'Empresas com pontuação acima de 92 geralmente implementam frameworks estruturados prontos para IA.'
+          : 'Businesses scoring above 92 typically implement structured AI-ready frameworks.'
+        }
       </p>
     </div>
 
@@ -347,21 +400,29 @@ async function sendEmail(
     <div style="margin-top: 40px; padding: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; text-align: center;">
       <h3 style="color: white; font-size: 20px; font-weight: 600; margin-top: 0; margin-bottom: 12px;">
         ${isPT 
-          ? 'Quer aumentar sua pontuação?'
-          : 'Want to improve your score?'
+          ? 'Desbloqueie o Plano Completo de Otimização de Visibilidade IA'
+          : 'Unlock Full AI Visibility Optimization Plan'
         }
       </h3>
-      <p style="color: rgba(255, 255, 255, 0.9); font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
-        ${isPT
-          ? 'Nossa auditoria completa de visibilidade IA inclui análise detalhada, comparação competitiva, roadmap personalizado de melhorias e implementação de otimizações. Veja como sua empresa pode alcançar 90+ pontos.'
-          : 'Our complete AI visibility audit includes detailed analysis, competitive comparison, personalized improvement roadmap, and optimization implementation. See how your business can reach 90+ points.'
-        }
-      </p>
+      <div style="text-align: left; background: rgba(255, 255, 255, 0.1); padding: 16px; border-radius: 8px; margin: 16px 0;">
+        <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.95); font-size: 14px; line-height: 1.8;">
+          <li style="margin-bottom: 8px;">${isPT ? 'Análise detalhada de lacunas competitivas' : 'Detailed competitive gap analysis'}</li>
+          <li style="margin-bottom: 8px;">${isPT ? 'Roadmap de melhorias de dados estruturados' : 'Structured data improvement roadmap'}</li>
+          <li style="margin-bottom: 8px;">${isPT ? 'Estratégia de aprimoramento de interpretação pela IA' : 'AI interpretation enhancement strategy'}</li>
+          <li style="margin-bottom: 0;">${isPT ? 'Orientação de implementação' : 'Implementation guidance'}</li>
+        </ul>
+      </div>
       <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}" 
          style="display: inline-block; background: white; color: #667eea; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-        ${isPT ? 'Solicitar Auditoria Completa' : 'Request Complete Audit'}
+        ${isPT ? 'Solicitar Plano Completo' : 'Request Full Plan'}
       </a>
-      <p style="color: rgba(255, 255, 255, 0.8); font-size: 12px; margin-top: 16px; margin-bottom: 0;">
+      <p style="color: rgba(255, 255, 255, 0.85); font-size: 13px; margin-top: 20px; margin-bottom: 8px; line-height: 1.6; font-style: italic;">
+        ${isPT
+          ? 'Os frameworks de interpretação pela IA estão evoluindo rapidamente. Empresas que otimizam cedo ganham vantagem estrutural.'
+          : 'AI interpretation frameworks are evolving rapidly. Businesses optimizing early gain structural advantage.'
+        }
+      </p>
+      <p style="color: rgba(255, 255, 255, 0.8); font-size: 12px; margin-top: 12px; margin-bottom: 0;">
         ${isPT ? 'Gratuita • Sem compromisso • Resultados em 48h' : 'Free • No commitment • Results in 48h'}
       </p>
     </div>
@@ -507,6 +568,10 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: 'Test submitted successfully',
+      result: {
+        ...result,
+        website,
+      },
     })
     
     // Add CORS headers

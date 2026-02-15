@@ -3,6 +3,7 @@
 import React from "react"
 import type { LangContent } from "@/lib/content"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { ArrowRight, CheckCircle2, Globe, Mail, Shield, AlertCircle } from "lucide-react"
 import { useAnimateIn } from "@/hooks/use-animate-in"
 
@@ -10,6 +11,7 @@ export function FormSection({ content }: { content: LangContent }) {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
   const { ref, isVisible } = useAnimateIn()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -37,7 +39,13 @@ export function FormSection({ content }: { content: LangContent }) {
         throw new Error(data.error || "Failed to submit test")
       }
 
-      setSubmitted(true)
+      // Store result in sessionStorage and redirect to results page
+      if (data.result) {
+        sessionStorage.setItem('aiVisibilityResult', JSON.stringify(data.result))
+        router.push(`/${lang}/results`)
+      } else {
+        setSubmitted(true)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
       setSubmitting(false)
