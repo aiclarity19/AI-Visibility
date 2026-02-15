@@ -283,7 +283,10 @@ export async function POST(request: NextRequest) {
   
   // Allow if:
   // 1. Origin header matches allowed origins (cross-origin requests)
-  // 2. Referer matches allowed domains (same-origin requests from https://www.aiclarity.online/en or /en#test)
+  // 2. Referer matches allowed domains (same-origin requests from:
+  //    - https://www.aiclarity.online/en or /en#test
+  //    - https://www.aiclarity.online/pt or /pt#test
+  //    - Any other path on aiclarity.online)
   const isAllowed = 
     isOriginAllowed(origin) || 
     (referer && ALLOWED_ORIGINS.some(allowed => referer.startsWith(allowed)))
