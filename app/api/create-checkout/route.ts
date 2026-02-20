@@ -10,13 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { website, email, lang = 'en' } = body
 
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      )
-    }
-
+    // Email is optional - Stripe will collect it during checkout if not provided
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -36,10 +30,11 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}/${lang}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}/${lang}/results`,
-      customer_email: email,
+      // Only set customer_email if email is provided
+      ...(email && { customer_email: email }),
       metadata: {
         website: website || '',
-        email: email,
+        email: email || '',
         lang: lang,
       },
     })
