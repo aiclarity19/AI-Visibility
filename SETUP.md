@@ -28,6 +28,16 @@ NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 # and appends rows to a Google Sheet
 # Format: https://hooks.zapier.com/hooks/catch/...
 GOOGLE_SHEETS_WEBHOOK_URL=
+
+# Stripe API Keys
+# Get your keys from: https://dashboard.stripe.com/apikeys
+STRIPE_SECRET_KEY=sk_live_your-stripe-secret-key
+STRIPE_WEBHOOK_SECRET=whsec_your-webhook-signing-secret
+
+# Supabase Configuration
+# Get your keys from: https://app.supabase.com/project/_/settings/api
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 ## Setup Steps
@@ -57,6 +67,22 @@ GOOGLE_SHEETS_WEBHOOK_URL=
    - Configure it to append rows to a Google Sheet
    - Add the webhook URL to `GOOGLE_SHEETS_WEBHOOK_URL`
 
+6. **Set up Stripe**
+   - Create a Stripe account at https://stripe.com
+   - Get your API keys from https://dashboard.stripe.com/apikeys
+   - Add `STRIPE_SECRET_KEY` (use test key for development: `sk_test_...`)
+   - Create a webhook endpoint in Stripe Dashboard:
+     - URL: `https://yourdomain.com/api/webhooks/stripe`
+     - Events to listen: `checkout.session.completed`, `payment_intent.succeeded`
+   - Copy the webhook signing secret and add as `STRIPE_WEBHOOK_SECRET`
+
+7. **Set up Supabase**
+   - Create a Supabase project at https://app.supabase.com
+   - Get your project URL and add as `NEXT_PUBLIC_SUPABASE_URL`
+   - Get your service role key from Settings → API → Service Role Key
+   - Add as `SUPABASE_SERVICE_ROLE_KEY`
+   - Run the SQL schema (see `supabase-schema.sql`) to create the payments table
+
 ## Testing
 
 1. Start the development server:
@@ -81,10 +107,44 @@ When deploying to Vercel:
 
 ## How It Works
 
+### Free Test Flow
 1. User submits form with website/company name and email
 2. API route (`/api/test`) receives the request
 3. OpenAI analyzes the website/business (single API call)
-4. Result is classified as CLEAR / PARTIAL / NOT CLEAR
+4. Result is classified with score (0-100) and 4 pillars
 5. Email is sent via Resend with the results
-6. Optional: Result is logged to Google Sheets via webhook
+6. Results are displayed on the website
+7. Optional: Result is logged to Google Sheets via webhook
+
+### Payment & Onboarding Flow
+1. User clicks "Purchase Full Plan" on results page
+2. Stripe Checkout session is created via `/api/create-checkout`
+3. User completes payment ($197 one-time)
+4. Stripe webhook (`/api/webhooks/stripe`) receives `checkout.session.completed` event
+5. Webhook verifies signature and checks idempotency
+6. Payment record is created in Supabase with status `paid`
+7. Onboarding email is automatically sent via Resend
+8. Status updated to `onboarding_sent`
+9. User completes onboarding form at `/onboarding`
+10. Onboarding data submitted to `/api/onboarding`
+11. Status updated to `onboarding_completed` then `ready_for_optimization`
+
+## Database Schema
+
+Run the SQL in `supabase-schema.sql` in your Supabase SQL editor to create the payments table.
+
+## Testing Payment Flow
+
+1. Use Stripe test mode keys (`sk_test_...`)
+2. Use Stripe test card: `4242 4242 4242 4242`
+3. Complete the full flow:
+   - Submit test form
+   - View results
+   - Click purchase button
+   - Complete test payment
+   - Verify webhook triggers
+   - Check Supabase for payment record
+   - Verify onboarding email sent
+   - Complete onboarding form
+   - Verify status updates in Supabase
 

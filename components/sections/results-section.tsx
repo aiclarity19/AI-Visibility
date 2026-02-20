@@ -283,10 +283,33 @@ export function ResultsSection({
               </ul>
             </div>
             <a
-              href="#test"
+              href="#"
+              onClick={async (e) => {
+                e.preventDefault()
+                try {
+                  const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      website: result.website,
+                      email: '', // Will be captured in checkout
+                      lang: isPT ? 'pt' : 'en',
+                    }),
+                  })
+                  const data = await response.json()
+                  if (data.url) {
+                    window.location.href = data.url
+                  } else {
+                    alert(isPT ? 'Erro ao criar checkout' : 'Error creating checkout')
+                  }
+                } catch (error) {
+                  console.error('Checkout error:', error)
+                  alert(isPT ? 'Erro ao processar pagamento' : 'Error processing payment')
+                }
+              }}
               className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors shadow-lg"
             >
-              {isPT ? 'Solicitar Plano Completo' : 'Request Full Plan'}
+              {isPT ? 'Comprar Plano Completo - $197' : 'Purchase Full Plan - $197'}
             </a>
             <p className="mt-4 text-sm text-white/85 italic leading-relaxed">
               {isPT
