@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { CheckCircle2, AlertCircle, Globe, MapPin, Building2, Target } from "lucide-react"
 import { SiteHeader } from "@/components/sections/site-header"
 import { SiteFooter } from "@/components/sections/site-footer"
 import { en } from "@/lib/content"
 
-export default function OnboardingPage() {
+function OnboardingForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -201,6 +201,18 @@ export default function OnboardingPage() {
       </main>
       <SiteFooter content={en} />
     </div>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <OnboardingForm />
+    </Suspense>
   )
 }
 
