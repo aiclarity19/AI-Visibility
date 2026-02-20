@@ -49,6 +49,16 @@ export function SiteHeader({ content }: { content: LangContent }) {
             {content.nav.howItWorks}
           </a>
           <a
+            href="#pricing"
+            className={`relative text-sm transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
+              scrolled
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-hero-muted hover:text-hero-foreground"
+            }`}
+          >
+            {content.lang === 'pt' ? 'Preços' : 'Pricing'}
+          </a>
+          <a
             href="#test"
             className="group relative overflow-hidden rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
           >
@@ -98,6 +108,13 @@ export function SiteHeader({ content }: { content: LangContent }) {
             onClick={() => setMobileOpen(false)}
           >
             {content.nav.howItWorks}
+          </a>
+          <a
+            href="#pricing"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            onClick={() => setMobileOpen(false)}
+          >
+            {content.lang === 'pt' ? 'Preços' : 'Pricing'}
           </a>
           <a
             href="#test"

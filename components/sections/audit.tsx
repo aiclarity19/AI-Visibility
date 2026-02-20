@@ -53,7 +53,7 @@ export function AuditSection({ content }: { content: LangContent }) {
               ))}
             </ul>
 
-            <div className="mt-10 text-center">
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="#test"
                 className="group relative w-full overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary bg-transparent px-6 py-3.5 text-sm font-semibold text-primary transition-all duration-300 sm:w-auto sm:px-8 sm:py-4 sm:text-base hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/20 hover:scale-[1.02]"
@@ -64,6 +64,37 @@ export function AuditSection({ content }: { content: LangContent }) {
                 </span>
                 <div className="absolute inset-0 -translate-y-full bg-primary transition-transform duration-300 group-hover:translate-y-0" />
               </a>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/create-checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        website: '',
+                        email: '',
+                        lang: content.lang,
+                      }),
+                    })
+                    const data = await response.json()
+                    if (data.url) {
+                      window.location.href = data.url
+                    } else {
+                      alert(content.lang === 'pt' ? 'Erro ao criar checkout' : 'Error creating checkout')
+                    }
+                  } catch (error) {
+                    console.error('Checkout error:', error)
+                    alert(content.lang === 'pt' ? 'Erro ao processar pagamento' : 'Error processing payment')
+                  }
+                }}
+                className="group relative w-full overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 sm:w-auto sm:px-8 sm:py-4 sm:text-base hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02]"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {content.lang === 'pt' ? 'Comprar Agora - $197' : 'Purchase Now - $197'}
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+                <div className="absolute inset-0 -translate-x-full bg-accent/80 transition-transform duration-500 group-hover:translate-x-0" />
+              </button>
             </div>
           </div>
         </div>
