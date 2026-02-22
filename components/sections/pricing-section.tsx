@@ -79,26 +79,36 @@ export function PricingSection({ content }: { content: LangContent }) {
           </p>
         </div>
 
-        <div className="mt-12 sm:mt-16 grid gap-8 md:grid-cols-2 lg:gap-12">
-          {/* $197 Diagnostic */}
-          <div
-            className={`transition-all duration-700 delay-200 ${
-              isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
-            }`}
-          >
-            <div className="relative rounded-2xl border-2 border-primary bg-card p-8 shadow-xl">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-foreground">$197</span>
-                  <span className="text-lg text-muted-foreground">{isPT ? 'único pagamento' : 'one-time'}</span>
+        <div className="mt-12 sm:mt-16">
+          <p className="text-center text-sm text-muted-foreground mb-8">
+            {isPT
+              ? 'Comece com o Diagnostic de $197, depois continue com Proteção mensal de $49'
+              : 'Start with $197 Diagnostic, then continue with $49/month Protection'}
+          </p>
+          
+          <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
+            {/* $197 Diagnostic */}
+            <div
+              className={`transition-all duration-700 delay-200 ${
+                isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+              }`}
+            >
+              <div className="relative rounded-2xl border-2 border-primary bg-card p-8 shadow-xl">
+                <div className="absolute -top-3 left-6 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                  {isPT ? 'PASSO 1' : 'STEP 1'}
                 </div>
-                <h3 className="mt-3 text-xl font-semibold text-foreground">
-                  {isPT ? 'AI Visibility Diagnostic' : 'AI Visibility Diagnostic'}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {isPT ? 'Entrega em 5-7 dias úteis' : 'Delivery: 5-7 business days'}
-                </p>
-              </div>
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-baseline gap-2">
+                    <span className="text-4xl font-bold text-foreground">$197</span>
+                    <span className="text-lg text-muted-foreground">{isPT ? 'único pagamento' : 'one-time'}</span>
+                  </div>
+                  <h3 className="mt-3 text-xl font-semibold text-foreground">
+                    {isPT ? 'AI Visibility Diagnostic' : 'AI Visibility Diagnostic'}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {isPT ? 'Entrega em 5-7 dias úteis' : 'Delivery: 5-7 business days'}
+                  </p>
+                </div>
 
               <div className="space-y-3 mb-6">
                 <p className="text-sm font-semibold text-foreground mb-2">
@@ -156,25 +166,28 @@ export function PricingSection({ content }: { content: LangContent }) {
             </div>
           </div>
 
-          {/* $49/Month Protection */}
-          <div
-            className={`transition-all duration-700 delay-300 ${
-              isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
-            }`}
-          >
-            <div className="relative rounded-2xl border-2 border-accent bg-card p-8 shadow-xl">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-foreground">$49</span>
-                  <span className="text-lg text-muted-foreground">/month</span>
+            {/* $49/Month Protection */}
+            <div
+              className={`transition-all duration-700 delay-300 ${
+                isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+              }`}
+            >
+              <div className="relative rounded-2xl border-2 border-accent bg-card p-8 shadow-xl">
+                <div className="absolute -top-3 left-6 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                  {isPT ? 'PASSO 2' : 'STEP 2'}
                 </div>
-                <h3 className="mt-3 text-xl font-semibold text-foreground">
-                  {isPT ? 'AI Visibility Protection' : 'AI Visibility Protection'}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {isPT ? 'Proteção estratégica contínua' : 'Ongoing strategic protection'}
-                </p>
-              </div>
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-baseline gap-2">
+                    <span className="text-4xl font-bold text-foreground">$49</span>
+                    <span className="text-lg text-muted-foreground">/month</span>
+                  </div>
+                  <h3 className="mt-3 text-xl font-semibold text-foreground">
+                    {isPT ? 'AI Visibility Protection' : 'AI Visibility Protection'}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {isPT ? 'Após o Diagnostic • Proteção contínua' : 'After Diagnostic • Ongoing protection'}
+                  </p>
+                </div>
 
               <div className="space-y-3 mb-6">
                 <p className="text-sm font-semibold text-foreground mb-2">
@@ -206,20 +219,30 @@ export function PricingSection({ content }: { content: LangContent }) {
                 ))}
               </div>
 
-              <button
-                onClick={async () => {
-                  // TODO: Implement subscription checkout
-                  alert(isPT ? 'Em breve disponível' : 'Coming soon')
-                }}
-                className="w-full group relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent bg-transparent px-6 py-3.5 text-sm font-semibold text-accent transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:scale-[1.02]"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  {isPT ? 'Assinar Proteção' : 'Subscribe to Protection'}
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </button>
+              <div className="pt-6 border-t border-border">
+                <p className="text-xs text-muted-foreground mb-4 text-center">
+                  {isPT
+                    ? 'Disponível após completar o Diagnostic de $197'
+                    : 'Available after completing $197 Diagnostic'}
+                </p>
+                <button
+                  onClick={async () => {
+                    // TODO: Implement subscription checkout
+                    alert(isPT 
+                      ? 'Complete primeiro o Diagnostic de $197 para acessar a Proteção mensal' 
+                      : 'Complete the $197 Diagnostic first to access monthly Protection')
+                  }}
+                  className="w-full group relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent bg-transparent px-6 py-3.5 text-sm font-semibold text-accent transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:scale-[1.02]"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    {isPT ? 'Assinar Proteção' : 'Subscribe to Protection'}
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
+        </div>
         </div>
 
         <div className="mt-8 text-center">
