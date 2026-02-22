@@ -37,7 +37,7 @@ export function SiteHeader({ content }: { content: LangContent }) {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-4 lg:gap-6 md:flex">
           <a
             href="#how-it-works"
             className={`relative text-sm transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
@@ -57,6 +57,36 @@ export function SiteHeader({ content }: { content: LangContent }) {
             }`}
           >
             {content.lang === 'pt' ? 'Preços' : 'Pricing'}
+          </a>
+          <a
+            href="#framework"
+            className={`relative text-sm transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
+              scrolled
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-hero-muted hover:text-hero-foreground"
+            }`}
+          >
+            {content.lang === 'pt' ? 'Metodologia' : 'Framework'}
+          </a>
+          <a
+            href="#outcomes"
+            className={`relative text-sm transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
+              scrolled
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-hero-muted hover:text-hero-foreground"
+            }`}
+          >
+            {content.lang === 'pt' ? 'Resultados' : 'Outcomes'}
+          </a>
+          <a
+            href="#faq"
+            className={`relative text-sm transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
+              scrolled
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-hero-muted hover:text-hero-foreground"
+            }`}
+          >
+            {content.lang === 'pt' ? 'FAQ' : 'FAQ'}
           </a>
           <a
             href="#test"
@@ -98,7 +128,7 @@ export function SiteHeader({ content }: { content: LangContent }) {
       {/* Mobile menu with slide animation */}
       <div
         className={`overflow-hidden transition-all duration-300 md:hidden ${
-          mobileOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
+          mobileOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <nav className="flex flex-col gap-4 border-t border-border bg-card/95 backdrop-blur-xl px-6 py-6">
@@ -115,6 +145,27 @@ export function SiteHeader({ content }: { content: LangContent }) {
             onClick={() => setMobileOpen(false)}
           >
             {content.lang === 'pt' ? 'Preços' : 'Pricing'}
+          </a>
+          <a
+            href="#framework"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            onClick={() => setMobileOpen(false)}
+          >
+            {content.lang === 'pt' ? 'Metodologia' : 'Framework'}
+          </a>
+          <a
+            href="#outcomes"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            onClick={() => setMobileOpen(false)}
+          >
+            {content.lang === 'pt' ? 'Resultados' : 'Outcomes'}
+          </a>
+          <a
+            href="#faq"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            onClick={() => setMobileOpen(false)}
+          >
+            {content.lang === 'pt' ? 'FAQ' : 'FAQ'}
           </a>
           <a
             href="#test"

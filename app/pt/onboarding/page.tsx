@@ -22,7 +22,11 @@ function OnboardingForm() {
     website: website,
     primary_services: '',
     target_city: '',
-    competitors: '',
+    differentiation: '',
+    certifications: '',
+    google_business_link: '',
+    content_presence: '',
+    ai_association_goal: '',
   })
 
   useEffect(() => {
@@ -164,18 +168,82 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <label htmlFor="competitors" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                <label htmlFor="differentiation" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                   <Target className="h-4 w-4 text-muted-foreground" />
-                  Concorrentes (Opcional)
+                  O que te diferencia?
+                </label>
+                <textarea
+                  id="differentiation"
+                  name="differentiation"
+                  value={formData.differentiation}
+                  onChange={(e) => setFormData({ ...formData, differentiation: e.target.value })}
+                  placeholder="O que diferencia seu negócio dos concorrentes?"
+                  rows={3}
+                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="certifications" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Target className="h-4 w-4 text-muted-foreground" />
+                  Certificações ou Credenciais
                 </label>
                 <input
-                  id="competitors"
-                  name="competitors"
+                  id="certifications"
+                  name="certifications"
                   type="text"
-                  value={formData.competitors}
-                  onChange={(e) => setFormData({ ...formData, competitors: e.target.value })}
-                  placeholder="Liste os principais concorrentes, se houver"
+                  value={formData.certifications}
+                  onChange={(e) => setFormData({ ...formData, certifications: e.target.value })}
+                  placeholder="ex: Certificado pelo conselho, Licenciado, etc."
                   className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="google_business_link" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  Link do Google Meu Negócio
+                </label>
+                <input
+                  id="google_business_link"
+                  name="google_business_link"
+                  type="url"
+                  value={formData.google_business_link}
+                  onChange={(e) => setFormData({ ...formData, google_business_link: e.target.value })}
+                  placeholder="https://g.page/sua-empresa"
+                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="content_presence" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  Presença de Conteúdo Atual
+                </label>
+                <textarea
+                  id="content_presence"
+                  name="content_presence"
+                  value={formData.content_presence}
+                  onChange={(e) => setFormData({ ...formData, content_presence: e.target.value })}
+                  placeholder="Você tem blog, redes sociais, vídeos ou outro conteúdo?"
+                  rows={3}
+                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="ai_association_goal" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Target className="h-4 w-4 text-muted-foreground" />
+                  Objetivo de Associação com IA Desejado
+                </label>
+                <textarea
+                  id="ai_association_goal"
+                  name="ai_association_goal"
+                  value={formData.ai_association_goal}
+                  onChange={(e) => setFormData({ ...formData, ai_association_goal: e.target.value })}
+                  placeholder="Como você quer que a IA descreva ou recomende seu negócio?"
+                  rows={3}
+                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
                 />
               </div>
 

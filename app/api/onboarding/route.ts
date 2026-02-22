@@ -4,7 +4,17 @@ import { supabaseAdmin } from '@/lib/supabase'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, website, primary_services, target_city, competitors } = body
+    const { 
+      email, 
+      website, 
+      primary_services, 
+      target_city, 
+      differentiation,
+      certifications,
+      google_business_link,
+      content_presence,
+      ai_association_goal
+    } = body
 
     if (!email || !website || !primary_services || !target_city) {
       return NextResponse.json(
