@@ -1,8 +1,8 @@
 "use client"
 
 import { Suspense, useState, useEffect } from "react"
-import { useSearchParams, useRouter  } from "next/navigation"
-import { CheckCircle2, AlertCircle, Globe, MapPin, Building2, Target, Phone, Instagram } from "lucide-react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { CheckCircle2, AlertCircle, Globe, MapPin, Building2, Phone, Instagram } from "lucide-react"
 import { SiteHeader } from "@/components/sections/site-header"
 import { SiteFooter } from "@/components/sections/site-footer"
 import { en } from "@/lib/content"
@@ -45,39 +45,37 @@ function OnboardingForm() {
 
   useEffect(() => {
 
-  async function verifyAccess() {
+    async function verifyAccess() {
 
-    if (!email) {
-      setAuthorized(false)
-      router.push("/")
-      return
-    }
+      if (!email) {
+        setAuthorized(false)
+        router.push("/")
+        return
+      }
 
-    try {
+      try {
 
-      const res = await fetch(`/api/verify-onboarding?email=${email}`)
-      const data = await res.json()
+        const res = await fetch(`/api/verify-onboarding?email=${email}`)
+        const data = await res.json()
 
-      if (data.allowed) {
-        setAuthorized(true)
-      } else {
+        if (data.allowed) {
+          setAuthorized(true)
+        } else {
+          setAuthorized(false)
+          router.push("/")
+        }
+
+      } catch (error) {
+        console.error(error)
         setAuthorized(false)
         router.push("/")
       }
-
-    } catch (error) {
-      console.error(error)
-      setAuthorized(false)
-      router.push("/")
     }
 
-  }
+    verifyAccess()
 
-  verifyAccess()
+  }, [email, router])
 
-}, [email, router])
-
-  
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
@@ -121,17 +119,19 @@ function OnboardingForm() {
   }
 
   if (authorized === null) {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
-  )
-}
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   if (submitted) {
     return (
       <div className="min-h-screen">
+
         <SiteHeader content={en} />
+
         <main className="flex items-center justify-center min-h-[60vh] px-4">
           <div className="max-w-md w-full text-center">
 
@@ -147,244 +147,223 @@ function OnboardingForm() {
             </h2>
 
             <p className="text-muted-foreground mb-6">
-              Thank you for submitting your business details. We will now begin analyzing your AI visibility and preparing the optimization plan.
-            </p>
-
-            <p className="text-sm text-muted-foreground">
-              You will receive an update within 24–48 hours.
+              Thank you for submitting your business details. We will now begin analyzing your AI visibility.
             </p>
 
           </div>
         </main>
+
         <SiteFooter content={en} />
+
       </div>
     )
   }
 
-<form onSubmit={handleSubmit} className="space-y-6">
+  return (
+    <div className="min-h-screen">
 
-{/* BUSINESS NAME */}
+      <SiteHeader content={en} />
 
-<div>
-<label className="mb-2 text-sm font-medium flex items-center gap-2">
-<Building2 className="h-4 w-4 text-muted-foreground"/>
-Business Name
-</label>
+      <main className="py-16 sm:py-24 px-4">
 
-<input
-type="text"
-required
-value={formData.business_name}
-onChange={(e)=>setFormData({...formData,business_name:e.target.value})}
-placeholder="Your business name"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+        <div className="max-w-2xl mx-auto">
 
-{/* WEBSITE */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Complete Your Onboarding
+            </h1>
+            <p className="text-muted-foreground">
+              Provide a few details so we can structure your AI visibility optimization.
+            </p>
+          </div>
 
-<div>
-<label className="mb-2 text-sm font-medium flex items-center gap-2">
-<Globe className="h-4 w-4 text-muted-foreground"/>
-Website
-</label>
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-lg">
 
-<input
-type="text"
-required
-value={formData.website}
-onChange={(e)=>setFormData({...formData,website:e.target.value})}
-placeholder="https://yourbusiness.com"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+            {error && (
+              <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800 mb-6">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
-{/* PRODUCTS */}
+            <form onSubmit={handleSubmit} className="space-y-6">
 
-<div>
-<label className="mb-2 text-sm font-medium">
-Main Products Offered
-</label>
+              <div>
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground"/>
+                  Business Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.business_name}
+                  onChange={(e)=>setFormData({...formData,business_name:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<textarea
-rows={3}
-value={formData.products}
-onChange={(e)=>setFormData({...formData,products:e.target.value})}
-placeholder="Kosher cakes, Shabbat desserts, custom sweets..."
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+              <div>
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-muted-foreground"/>
+                  Website
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.website}
+                  onChange={(e)=>setFormData({...formData,website:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-{/* BUSINESS DIFFERENTIATOR */}
+              <div>
+                <label className="text-sm font-medium">
+                  Main Products Offered
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.products}
+                  onChange={(e)=>setFormData({...formData,products:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<div>
-<label className="mb-2 text-sm font-medium">
-What makes your business unique?
-</label>
+              <div>
+                <label className="text-sm font-medium">
+                  What makes your business unique?
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.differentiator}
+                  onChange={(e)=>setFormData({...formData,differentiator:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<textarea
-rows={3}
-value={formData.differentiator}
-onChange={(e)=>setFormData({...formData,differentiator:e.target.value})}
-placeholder="Artisanal production, certified kosher desserts, premium ingredients..."
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+              <div>
+                <label className="text-sm font-medium">
+                  Main services or product categories
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.service_categories}
+                  onChange={(e)=>setFormData({...formData,service_categories:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-{/* MAIN SERVICES / CATEGORIES */}
+              <div>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground"/>
+                  Service Area / Delivery Area
+                </label>
+                <input
+                  value={formData.service_area}
+                  onChange={(e)=>setFormData({...formData,service_area:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<div>
-<label className="mb-2 text-sm font-medium">
-Main services or product categories
-</label>
+              <div>
+                <label className="text-sm font-medium">
+                  Common questions customers ask
+                </label>
+                <textarea
+                  rows={4}
+                  value={formData.faqs}
+                  onChange={(e)=>setFormData({...formData,faqs:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<textarea
-rows={3}
-value={formData.service_categories}
-onChange={(e)=>setFormData({...formData,service_categories:e.target.value})}
-placeholder="Kosher cakes, Shabbat desserts, catering for Jewish events"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+              <div>
+                <label className="text-sm font-medium">
+                  Main competitors
+                </label>
+                <input
+                  value={formData.competitors}
+                  onChange={(e)=>setFormData({...formData,competitors:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
+              <div>
+                <label className="text-sm font-medium">
+                  Year business founded
+                </label>
+                <input
+                  value={formData.year_founded}
+                  onChange={(e)=>setFormData({...formData,year_founded:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
+              <div>
+                <label className="text-sm font-medium">
+                  Keywords customers search
+                </label>
+                <input
+                  value={formData.keywords}
+                  onChange={(e)=>setFormData({...formData,keywords:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-{/* SERVICE AREA */}
+              <div>
+                <label className="text-sm font-medium">
+                  Google Business Profile
+                </label>
+                <input
+                  value={formData.google_business_link}
+                  onChange={(e)=>setFormData({...formData,google_business_link:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<div>
-<label className="mb-2 text-sm font-medium flex items-center gap-2">
-<MapPin className="h-4 w-4 text-muted-foreground"/>
-Service Area / Delivery Area
-</label>
+              <div>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Instagram className="h-4 w-4 text-muted-foreground"/>
+                  Instagram
+                </label>
+                <input
+                  value={formData.instagram}
+                  onChange={(e)=>setFormData({...formData,instagram:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-<input
-value={formData.service_area}
-onChange={(e)=>setFormData({...formData,service_area:e.target.value})}
-placeholder="São Paulo (Higienópolis, Jardins, Bom Retiro)"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+              <div>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground"/>
+                  Phone / WhatsApp
+                </label>
+                <input
+                  value={formData.phone}
+                  onChange={(e)=>setFormData({...formData,phone:e.target.value})}
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
 
-{/* FAQs */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground"
+              >
+                {submitting ? "Submitting..." : "Submit Onboarding Form"}
+              </button>
 
-<div>
-<label className="mb-2 text-sm font-medium">
-Common questions customers ask
-</label>
+            </form>
 
-<textarea
-rows={4}
-value={formData.faqs}
-onChange={(e)=>setFormData({...formData,faqs:e.target.value})}
-placeholder="Are your desserts certified kosher? Do you deliver before Shabbat?"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+          </div>
 
-{/* COMPETITORS */}
+        </div>
 
-<div>
-<label className="mb-2 text-sm font-medium">
-Main competitors (optional)
-</label>
+      </main>
 
-<input
-value={formData.competitors}
-onChange={(e)=>setFormData({...formData,competitors:e.target.value})}
-placeholder="Bakery A, Store B"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
+      <SiteFooter content={en} />
 
-{/* YEAR FOUNDED */}
-
-<div>
-<label className="mb-2 text-sm font-medium">
-Year business was founded
-</label>
-
-<input
-value={formData.year_founded}
-onChange={(e)=>setFormData({...formData,year_founded:e.target.value})}
-placeholder="Example: 2018"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
-
-{/* KEYWORDS */}
-
-<div>
-<label className="mb-2 text-sm font-medium">
-Main Keywords Customers Search
-</label>
-
-<input
-value={formData.keywords}
-onChange={(e)=>setFormData({...formData,keywords:e.target.value})}
-placeholder="kosher desserts São Paulo"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
-
-{/* GOOGLE BUSINESS */}
-
-<div>
-<label className="mb-2 text-sm font-medium">
-Google Business Profile
-</label>
-
-<input
-type="url"
-value={formData.google_business_link}
-onChange={(e)=>setFormData({...formData,google_business_link:e.target.value})}
-placeholder="Google Maps listing link"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
-
-{/* INSTAGRAM */}
-
-<div>
-<label className="mb-2 text-sm font-medium flex items-center gap-2">
-<Instagram className="h-4 w-4 text-muted-foreground"/>
-Instagram
-</label>
-
-<input
-value={formData.instagram}
-onChange={(e)=>setFormData({...formData,instagram:e.target.value})}
-placeholder="Instagram profile link"
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
-
-{/* PHONE */}
-
-<div>
-<label className="mb-2 text-sm font-medium flex items-center gap-2">
-<Phone className="h-4 w-4 text-muted-foreground"/>
-Phone / WhatsApp
-</label>
-
-<input
-value={formData.phone}
-onChange={(e)=>setFormData({...formData,phone:e.target.value})}
-placeholder="+55..."
-className="w-full rounded-xl border border-input px-4 py-3"
-/>
-</div>
-
-{/* SUBMIT BUTTON */}
-
-<button
-type="submit"
-disabled={submitting}
-className="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground hover:scale-[1.02]"
->
-{submitting ? "Submitting..." : "Submit Onboarding Form"}
-</button>
-
-</form>
+    </div>
+  )
 }
 
 export default function OnboardingPage() {
