@@ -39,7 +39,7 @@ function OnboardingForm() {
 
   useEffect(() => {
     if (sessionId) {
-      console.log("Pagamento bem-sucedido, sessão:", sessionId)
+      console.log("Pagamento bem-sucedido:", sessionId)
     }
   }, [sessionId])
 
@@ -70,18 +70,18 @@ function OnboardingForm() {
         setAuthorized(false)
         router.push("/")
       }
-
     }
 
     verifyAccess()
 
   }, [email, router])
 
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
     e.preventDefault()
-    setError(null)
     setSubmitting(true)
+    setError(null)
 
     try {
 
@@ -92,14 +92,14 @@ function OnboardingForm() {
         },
         body: JSON.stringify({
           ...formData,
-          email: email,
-        }),
+          email
+        })
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Falha ao enviar formulário")
+        throw new Error(data.error || "Erro ao enviar formulário")
       }
 
       setSubmitted(true)
@@ -132,24 +132,27 @@ function OnboardingForm() {
         <SiteHeader content={pt} />
 
         <main className="flex items-center justify-center min-h-[60vh] px-4">
-          <div className="max-w-md w-full text-center">
+
+          <div className="max-w-md text-center">
 
             <div className="relative flex h-20 w-20 items-center justify-center mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full bg-emerald-100 animate-ping opacity-20" />
+              <div className="absolute inset-0 rounded-full bg-emerald-100 animate-ping opacity-20"/>
               <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                <CheckCircle2 className="h-8 w-8" />
+                <CheckCircle2 className="h-8 w-8"/>
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-foreground mb-3">
+            <h2 className="text-2xl font-bold mb-3">
               Onboarding Completo!
             </h2>
 
-            <p className="text-muted-foreground mb-6">
-              Obrigado por enviar os dados do seu negócio. Agora vamos iniciar a análise da visibilidade de IA.
+            <p className="text-muted-foreground">
+              Obrigado por enviar as informações do seu negócio.
+              Agora iniciaremos a análise de visibilidade em IA.
             </p>
 
           </div>
+
         </main>
 
         <SiteFooter content={pt} />
@@ -159,6 +162,7 @@ function OnboardingForm() {
   }
 
   return (
+
     <div className="min-h-screen">
 
       <SiteHeader content={pt} />
@@ -168,112 +172,127 @@ function OnboardingForm() {
         <div className="max-w-2xl mx-auto">
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Complete Seu Onboarding
+            <h1 className="text-3xl font-bold mb-2">
+              Complete seu Onboarding
             </h1>
             <p className="text-muted-foreground">
-              Ajude-nos a entender seu negócio para melhorar sua visibilidade em IA.
+              Ajude-nos a estruturar a visibilidade do seu negócio para IA
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-lg">
+          <div className="rounded-2xl border bg-card p-6 sm:p-8 shadow-lg">
 
             {error && (
               <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800 mb-6">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <AlertCircle className="h-4 w-4"/>
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
 
+              {/* BUSINESS NAME */}
+
               <div>
-                <label className="text-sm font-medium">Nome do Negócio</label>
+                <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                  <Building2 className="h-4 w-4 text-muted-foreground"/>
+                  Nome do Negócio
+                </label>
+
                 <input
                   value={formData.business_name}
                   onChange={(e)=>setFormData({...formData,business_name:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
+              {/* WEBSITE */}
+
               <div>
-                <label className="text-sm font-medium">Site</label>
+                <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                  <Globe className="h-4 w-4 text-muted-foreground"/>
+                  Website
+                </label>
+
                 <input
                   value={formData.website}
                   onChange={(e)=>setFormData({...formData,website:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
+              {/* PRODUCTS */}
+
               <div>
-                <label className="text-sm font-medium">Principais Produtos</label>
+                <label className="text-sm font-medium">
+                  Produtos Principais
+                </label>
+
                 <textarea
+                  rows={3}
                   value={formData.products}
                   onChange={(e)=>setFormData({...formData,products:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
+              {/* DIFFERENTIATOR */}
+
               <div>
-                <label className="text-sm font-medium">O que torna seu negócio único?</label>
+                <label className="text-sm font-medium">
+                  Diferencial do negócio
+                </label>
+
                 <textarea
+                  rows={3}
                   value={formData.differentiator}
                   onChange={(e)=>setFormData({...formData,differentiator:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
-              <div>
-                <label className="text-sm font-medium">Categorias de produtos</label>
-                <textarea
-                  value={formData.service_categories}
-                  onChange={(e)=>setFormData({...formData,service_categories:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                />
-              </div>
+              {/* SERVICE AREA */}
 
               <div>
-                <label className="text-sm font-medium">Área de entrega</label>
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <MapPin className="h-4 w-4 text-muted-foreground"/>
+                  Área de entrega
+                </label>
+
                 <input
                   value={formData.service_area}
                   onChange={(e)=>setFormData({...formData,service_area:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
-              <div>
-                <label className="text-sm font-medium">Perguntas frequentes</label>
-                <textarea
-                  value={formData.faqs}
-                  onChange={(e)=>setFormData({...formData,faqs:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                />
-              </div>
+              {/* INSTAGRAM */}
 
               <div>
-                <label className="text-sm font-medium">Concorrentes</label>
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <Instagram className="h-4 w-4 text-muted-foreground"/>
+                  Instagram
+                </label>
+
                 <input
-                  value={formData.competitors}
-                  onChange={(e)=>setFormData({...formData,competitors:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  value={formData.instagram}
+                  onChange={(e)=>setFormData({...formData,instagram:e.target.value})}
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
-              <div>
-                <label className="text-sm font-medium">Ano de fundação</label>
-                <input
-                  value={formData.year_founded}
-                  onChange={(e)=>setFormData({...formData,year_founded:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                />
-              </div>
+              {/* PHONE */}
 
               <div>
-                <label className="text-sm font-medium">Palavras-chave</label>
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <Phone className="h-4 w-4 text-muted-foreground"/>
+                  Telefone / WhatsApp
+                </label>
+
                 <input
-                  value={formData.keywords}
-                  onChange={(e)=>setFormData({...formData,keywords:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
+                  value={formData.phone}
+                  onChange={(e)=>setFormData({...formData,phone:e.target.value})}
+                  className="w-full rounded-xl border px-4 py-3"
                 />
               </div>
 
