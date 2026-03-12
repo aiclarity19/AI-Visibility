@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter  } from "next/navigation"
 import { CheckCircle2, AlertCircle, Globe, MapPin, Building2, Target, Phone, Instagram } from "lucide-react"
 import { SiteHeader } from "@/components/sections/site-header"
 import { SiteFooter } from "@/components/sections/site-footer"
@@ -10,10 +10,12 @@ import { en } from "@/lib/content"
 function OnboardingForm() {
 
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [authorized, setAuthorized] = useState<boolean | null>(null)
 
   const email = searchParams.get("email") || ""
   const website = searchParams.get("website") || ""
@@ -43,6 +45,42 @@ function OnboardingForm() {
       console.log("Payment successful session:", sessionId)
     }
   }, [sessionId])
+
+  useEffect(() => {
+
+  async function verifyAccess() {
+
+    if (!email) {
+      setAuthorized(false)
+      router.push("/")
+      return
+    }
+
+    try {
+
+      const res = await fetch(`/api/verify-onboarding?email=${email}`)
+      const data = await res.json()
+
+      if (data.allowed) {
+        setAuthorized(true)
+      } else {
+        setAuthorized(false)
+        router.push("/")
+      }
+
+    } catch (error) {
+      console.error(error)
+      setAuthorized(false)
+      router.push("/")
+    }
+
+  }
+
+  verifyAccess()
+
+}, [email, router])
+
+  
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
@@ -84,6 +122,14 @@ function OnboardingForm() {
 
     }
   }
+
+  if (authorized === null) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  )
+}
 
   if (submitted) {
     return (
