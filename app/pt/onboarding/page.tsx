@@ -22,22 +22,19 @@ function OnboardingForm() {
   const sessionId = searchParams.get('session_id')
 
   const [formData, setFormData] = useState({
-    business_name: '',
+    business_name: "",
     website: website,
-    products: '',
-    target_customers: '',
-    locations: '',
-    service_type: '',
-    primary_services: '',
-    target_city: '',
-    differentiation: '',
-    certifications: '',
-    keywords: '',
-    google_business_link: '',
-    instagram: '',
-    phone: '',
-    content_presence: '',
-    ai_association_goal: '',
+    products: "",
+    service_categories: "",
+    service_area: "",
+    differentiator: "",
+    faqs: "",
+    competitors: "",
+    year_founded: "",
+    keywords: "",
+    google_business_link: "",
+    instagram: "",
+    phone: ""
   })
 
   useEffect(() => {
@@ -163,219 +160,226 @@ function OnboardingForm() {
     )
   }
 
-  return (
+  <form onSubmit={handleSubmit} className="space-y-6">
 
-    <div className="min-h-screen">
+{/* BUSINESS NAME */}
 
-      <SiteHeader content={pt} />
+<div>
+<label className="mb-2 flex items-center gap-2 text-sm font-medium">
+<Building2 className="h-4 w-4 text-muted-foreground" />
+Nome do Negócio
+</label>
 
-      <main className="py-16 sm:py-24 px-4">
+<input
+type="text"
+required
+value={formData.business_name}
+onChange={(e)=>setFormData({...formData,business_name:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Nome do seu negócio"
+/>
+</div>
 
-        <div className="max-w-2xl mx-auto">
+{/* WEBSITE */}
 
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Complete Seu Onboarding
-            </h1>
-            <p className="text-muted-foreground">
-              Ajude-nos a entender seu negócio para estruturar sua visibilidade em IA
-            </p>
-          </div>
+<div>
+<label className="mb-2 flex items-center gap-2 text-sm font-medium">
+<Globe className="h-4 w-4 text-muted-foreground" />
+Site
+</label>
 
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-lg">
+<input
+type="text"
+required
+value={formData.website}
+onChange={(e)=>setFormData({...formData,website:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="https://suaempresa.com.br"
+/>
+</div>
 
-            {error && (
-              <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800 mb-6">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+{/* PRODUCTS */}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+<div>
+<label className="text-sm font-medium">
+Principais Produtos
+</label>
 
-              {/* BUSINESS NAME */}
+<textarea
+rows={3}
+value={formData.products}
+onChange={(e)=>setFormData({...formData,products:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Bolos kosher, sobremesas para Shabbat..."
+/>
+</div>
 
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  Nome do Negócio
-                </label>
+{/* BUSINESS DIFFERENTIATOR */}
 
-                <input
-                  type="text"
-                  required
-                  value={formData.business_name}
-                  onChange={(e)=>setFormData({...formData,business_name:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="Nome do seu negócio"
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+O que torna seu negócio único?
+</label>
 
-              {/* WEBSITE */}
+<textarea
+rows={3}
+value={formData.differentiator}
+onChange={(e)=>setFormData({...formData,differentiator:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Produção artesanal, ingredientes premium, certificado kosher..."
+/>
+</div>
 
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  Site
-                </label>
+{/* SERVICE CATEGORIES */}
 
-                <input
-                  type="text"
-                  required
-                  value={formData.website}
-                  onChange={(e)=>setFormData({...formData,website:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="https://suaempresa.com.br"
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+Principais categorias de produtos
+</label>
 
-              {/* PRODUCTS */}
+<textarea
+rows={3}
+value={formData.service_categories}
+onChange={(e)=>setFormData({...formData,service_categories:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Bolos kosher, sobremesas de Shabbat, catering para eventos judaicos"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium">
-                  Principais Produtos
-                </label>
+{/* SERVICE AREA */}
 
-                <textarea
-                  rows={3}
-                  value={formData.products}
-                  onChange={(e)=>setFormData({...formData,products:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="Bolos kosher, sobremesas para Shabbat..."
-                />
-              </div>
+<div>
+<label className="text-sm font-medium flex items-center gap-2">
+<MapPin className="h-4 w-4 text-muted-foreground"/>
+Área de atendimento / entrega
+</label>
 
-              {/* TARGET CUSTOMERS */}
+<input
+value={formData.service_area}
+onChange={(e)=>setFormData({...formData,service_area:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="São Paulo (Higienópolis, Jardins, Bom Retiro)"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium">
-                  Clientes Alvo
-                </label>
+{/* FAQ */}
 
-                <textarea
-                  rows={3}
-                  value={formData.target_customers}
-                  onChange={(e)=>setFormData({...formData,target_customers:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="Comunidade judaica, eventos, famílias..."
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+Perguntas frequentes dos clientes
+</label>
 
-              {/* LOCATIONS */}
+<textarea
+rows={4}
+value={formData.faqs}
+onChange={(e)=>setFormData({...formData,faqs:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Seus produtos são certificados kosher? Vocês entregam antes do Shabbat?"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground"/>
-                  Cidade e Bairros Atendidos
-                </label>
+{/* COMPETITORS */}
 
-                <input
-                  value={formData.locations}
-                  onChange={(e)=>setFormData({...formData,locations:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="São Paulo – Higienópolis, Bom Retiro"
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+Principais concorrentes (opcional)
+</label>
 
-              {/* SERVICE TYPE */}
+<input
+value={formData.competitors}
+onChange={(e)=>setFormData({...formData,competitors:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Padaria A, Loja B"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium">
-                  Tipo de Serviço
-                </label>
+{/* YEAR FOUNDED */}
 
-                <input
-                  value={formData.service_type}
-                  onChange={(e)=>setFormData({...formData,service_type:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="Entrega, retirada, encomendas..."
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+Ano de fundação
+</label>
 
-              {/* KEYWORDS */}
+<input
+value={formData.year_founded}
+onChange={(e)=>setFormData({...formData,year_founded:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Exemplo: 2018"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium">
-                  Principais Palavras-chave
-                </label>
+{/* KEYWORDS */}
 
-                <input
-                  value={formData.keywords}
-                  onChange={(e)=>setFormData({...formData,keywords:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="sobremesas kosher São Paulo"
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+Principais palavras-chave
+</label>
 
-              {/* GOOGLE BUSINESS */}
+<input
+value={formData.keywords}
+onChange={(e)=>setFormData({...formData,keywords:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="sobremesas kosher São Paulo"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium">
-                  Google Meu Negócio
-                </label>
+{/* GOOGLE BUSINESS */}
 
-                <input
-                  type="url"
-                  value={formData.google_business_link}
-                  onChange={(e)=>setFormData({...formData,google_business_link:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="Link do Google Maps"
-                />
-              </div>
+<div>
+<label className="text-sm font-medium">
+Google Meu Negócio
+</label>
 
-              {/* INSTAGRAM */}
+<input
+type="url"
+value={formData.google_business_link}
+onChange={(e)=>setFormData({...formData,google_business_link:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="Link do Google Maps"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Instagram className="h-4 w-4 text-muted-foreground"/>
-                  Instagram
-                </label>
+{/* INSTAGRAM */}
 
-                <input
-                  value={formData.instagram}
-                  onChange={(e)=>setFormData({...formData,instagram:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="@seuinstagram"
-                />
-              </div>
+<div>
+<label className="text-sm font-medium flex items-center gap-2">
+<Instagram className="h-4 w-4 text-muted-foreground"/>
+Instagram
+</label>
 
-              {/* PHONE */}
+<input
+value={formData.instagram}
+onChange={(e)=>setFormData({...formData,instagram:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="@seuinstagram"
+/>
+</div>
 
-              <div>
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground"/>
-                  Telefone / WhatsApp
-                </label>
+{/* PHONE */}
 
-                <input
-                  value={formData.phone}
-                  onChange={(e)=>setFormData({...formData,phone:e.target.value})}
-                  className="w-full rounded-xl border border-input px-4 py-3"
-                  placeholder="+55..."
-                />
-              </div>
+<div>
+<label className="text-sm font-medium flex items-center gap-2">
+<Phone className="h-4 w-4 text-muted-foreground"/>
+Telefone / WhatsApp
+</label>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground hover:scale-[1.02]"
-              >
-                {submitting ? "Enviando..." : "Enviar Formulário"}
-              </button>
+<input
+value={formData.phone}
+onChange={(e)=>setFormData({...formData,phone:e.target.value})}
+className="w-full rounded-xl border border-input px-4 py-3"
+placeholder="+55..."
+/>
+</div>
 
-            </form>
+<button
+type="submit"
+disabled={submitting}
+className="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground hover:scale-[1.02]"
+>
+{submitting ? "Enviando..." : "Enviar Formulário"}
+</button>
 
-          </div>
-
-        </div>
-
-      </main>
-
-      <SiteFooter content={pt} />
-
-    </div>
-
-  )
+</form>
 
 }
 

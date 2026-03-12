@@ -11,19 +11,16 @@ export async function POST(request: NextRequest) {
       business_name,
       website,
       products,
-      target_customers,
-      locations,
-      service_type,
-      primary_services,
-      target_city,
-      differentiation,
-      certifications,
+      service_categories,
+      service_area,
+      differentiator,
+      faqs,
+      competitors,
+      year_founded,
       keywords,
       google_business_link,
       instagram,
-      phone,
-      content_presence,
-      ai_association_goal
+      phone
     } = body
 
     if (!email || !website) {
@@ -88,19 +85,16 @@ export async function POST(request: NextRequest) {
           business_name,
           website,
           products,
-          target_customers,
-          locations,
-          service_type,
-          primary_services,
-          target_city,
-          differentiation,
-          certifications,
+          service_categories,
+          service_area,
+          differentiator,
+          faqs,
+          competitors,
+          year_founded,
           keywords,
           google_business_link,
           instagram,
-          phone,
-          content_presence,
-          ai_association_goal
+          phone
         }
       ])
 
