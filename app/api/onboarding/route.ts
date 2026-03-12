@@ -3,27 +3,42 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
+
     const body = await request.json()
-    const { 
-      email, 
-      website, 
-      primary_services, 
-      target_city, 
+
+    const {
+      email,
+      business_name,
+      website,
+      products,
+      target_customers,
+      locations,
+      service_type,
+      primary_services,
+      target_city,
       differentiation,
       certifications,
+      keywords,
       google_business_link,
+      instagram,
+      phone,
       content_presence,
       ai_association_goal
     } = body
 
-    if (!email || !website || !primary_services || !target_city) {
+    if (!email || !website) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    // Find the payment record by email
+    /*
+    ----------------------------------------
+    VERIFY USER EXISTS IN PAYMENTS TABLE
+    ----------------------------------------
+    */
+
     const { data: paymentRecord, error: findError } = await supabaseAdmin
       .from('payments')
       .select('*')
@@ -34,62 +49,101 @@ export async function POST(request: NextRequest) {
 
     if (findError || !paymentRecord) {
       return NextResponse.json(
-        { error: 'Payment record not found. Please ensure you have completed payment.' },
-        { status: 404 }
+        { error: 'Unauthorized request. Payment record not found.' },
+        { status: 403 }
       )
     }
 
-    // Update the payment record with onboarding data and status
-    const { data: updatedRecord, error: updateError } = await supabaseAdmin
-      .from('payments')
-      .update({
-        website: website,
-        status: 'onboarding_completed',
-        updated_at: new Date().toISOString(),
-        // Store onboarding data in a JSON column (if you add one) or use metadata
-        // For now, we'll just update the website and status
-      })
-      .eq('id', paymentRecord.id)
-      .select()
-      .single()
+    /*
+    ----------------------------------------
+    VERIFY PAYMENT STATUS
+    ----------------------------------------
+    */
 
-    if (updateError) {
-      console.error('Error updating payment record:', updateError)
+    const allowedStatuses = [
+      'paid',
+      'onboarding_sent',
+      'onboarding_completed',
+      'ready_for_optimization'
+    ]
+
+    if (!allowedStatuses.includes(paymentRecord.status)) {
       return NextResponse.json(
-        { error: 'Failed to update onboarding data' },
+        { error: 'Access denied. Payment required before onboarding.' },
+        { status: 403 }
+      )
+    }
+
+    /*
+    ----------------------------------------
+    STORE ONBOARDING DATA
+    ----------------------------------------
+    */
+
+    const { error: onboardingError } = await supabaseAdmin
+      .from('onboarding_data')
+      .insert([
+        {
+          email,
+          business_name,
+          website,
+          products,
+          target_customers,
+          locations,
+          service_type,
+          primary_services,
+          target_city,
+          differentiation,
+          certifications,
+          keywords,
+          google_business_link,
+          instagram,
+          phone,
+          content_presence,
+          ai_association_goal
+        }
+      ])
+
+    if (onboardingError) {
+      console.error('Onboarding insert error:', onboardingError)
+
+      return NextResponse.json(
+        { error: 'Failed to store onboarding data' },
         { status: 500 }
       )
     }
 
-    // Update status to ready_for_optimization
-    // (You might want to add a review step, but per requirements, we go straight to ready)
-    const { error: finalUpdateError } = await supabaseAdmin
+    /*
+    ----------------------------------------
+    UPDATE PAYMENT STATUS
+    ----------------------------------------
+    */
+
+    const { error: updateError } = await supabaseAdmin
       .from('payments')
       .update({
+        website: website,
         status: 'ready_for_optimization',
-        updated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       })
       .eq('id', paymentRecord.id)
 
-    if (finalUpdateError) {
-      console.error('Error updating to ready_for_optimization:', finalUpdateError)
-      // Don't fail the request, just log it
+    if (updateError) {
+      console.error('Payment update error:', updateError)
     }
-
-    // Store onboarding data separately (you may want to create an onboarding_data table)
-    // For now, we'll store it in a simple table or extend the payments table
-    // This is a simplified version - you may want to create a separate onboarding_data table
 
     return NextResponse.json({
       success: true,
-      message: 'Onboarding completed successfully',
+      message: 'Onboarding completed successfully'
     })
+
   } catch (error) {
+
     console.error('Onboarding API error:', error)
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
-

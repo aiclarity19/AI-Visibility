@@ -1,52 +1,62 @@
 "use client"
 
 import { Suspense, useState, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { CheckCircle2, AlertCircle, Globe, MapPin, Building2, Target } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import { CheckCircle2, AlertCircle, Globe, MapPin, Building2, Target, Phone, Instagram } from "lucide-react"
 import { SiteHeader } from "@/components/sections/site-header"
 import { SiteFooter } from "@/components/sections/site-footer"
 import { en } from "@/lib/content"
 
 function OnboardingForm() {
+
   const searchParams = useSearchParams()
-  const router = useRouter()
+
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const email = searchParams.get('email') || ''
-  const website = searchParams.get('website') || ''
-  const sessionId = searchParams.get('session_id')
+  const email = searchParams.get("email") || ""
+  const website = searchParams.get("website") || ""
+  const sessionId = searchParams.get("session_id")
 
   const [formData, setFormData] = useState({
+    business_name: "",
     website: website,
-    primary_services: '',
-    target_city: '',
-    differentiation: '',
-    certifications: '',
-    google_business_link: '',
-    content_presence: '',
-    ai_association_goal: '',
+    products: "",
+    target_customers: "",
+    locations: "",
+    service_type: "",
+    primary_services: "",
+    target_city: "",
+    differentiation: "",
+    certifications: "",
+    keywords: "",
+    google_business_link: "",
+    instagram: "",
+    phone: "",
+    content_presence: "",
+    ai_association_goal: "",
   })
 
   useEffect(() => {
-    // If session_id exists, payment was successful
     if (sessionId) {
-      // Payment successful - show success message briefly
-      console.log('Payment successful, session:', sessionId)
+      console.log("Payment successful session:", sessionId)
     }
   }, [sessionId])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+
     e.preventDefault()
-    setError(null)
+
     setSubmitting(true)
+    setError(null)
 
     try {
-      const response = await fetch('/api/onboarding', {
-        method: 'POST',
+
+      const response = await fetch("/api/onboarding", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
@@ -57,13 +67,21 @@ function OnboardingForm() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit onboarding form')
+        throw new Error(data.error || "Failed to submit onboarding form")
       }
 
       setSubmitted(true)
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      )
+
       setSubmitting(false)
+
     }
   }
 
@@ -73,21 +91,26 @@ function OnboardingForm() {
         <SiteHeader content={en} />
         <main className="flex items-center justify-center min-h-[60vh] px-4">
           <div className="max-w-md w-full text-center">
+
             <div className="relative flex h-20 w-20 items-center justify-center mx-auto mb-6">
               <div className="absolute inset-0 rounded-full bg-emerald-100 animate-ping opacity-20" />
               <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
             </div>
+
             <h2 className="text-2xl font-bold text-foreground mb-3">
-              Onboarding Complete!
+              Onboarding Complete
             </h2>
+
             <p className="text-muted-foreground mb-6">
-              Thank you for completing the onboarding form. We'll review your information and get started on your AI visibility optimization plan.
+              Thank you for submitting your business details. We will now begin analyzing your AI visibility and preparing the optimization plan.
             </p>
+
             <p className="text-sm text-muted-foreground">
-              You'll receive an email with next steps within 24-48 hours.
+              You will receive an update within 24–48 hours.
             </p>
+
           </div>
         </main>
         <SiteFooter content={en} />
@@ -97,19 +120,24 @@ function OnboardingForm() {
 
   return (
     <div className="min-h-screen">
+
       <SiteHeader content={en} />
+
       <main className="py-16 sm:py-24 px-4">
+
         <div className="max-w-2xl mx-auto">
+
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Complete Your Onboarding
             </h1>
             <p className="text-muted-foreground">
-              Help us understand your business to create a personalized optimization plan
+              Provide a few details so we can structure your AI visibility optimization.
             </p>
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-lg">
+
             {error && (
               <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800 mb-6">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -118,156 +146,189 @@ function OnboardingForm() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+
+              {/* BUSINESS NAME */}
+
               <div>
-                <label htmlFor="website" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground"/>
+                  Business Name
+                </label>
+
+                <input
+                  type="text"
+                  required
+                  value={formData.business_name}
+                  onChange={(e)=>setFormData({...formData,business_name:e.target.value})}
+                  placeholder="Your business name"
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
+
+              {/* WEBSITE */}
+
+              <div>
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-muted-foreground"/>
                   Website
                 </label>
+
                 <input
-                  id="website"
-                  name="website"
                   type="text"
                   required
                   value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  onChange={(e)=>setFormData({...formData,website:e.target.value})}
                   placeholder="https://yourbusiness.com"
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                  className="w-full rounded-xl border border-input px-4 py-3"
                 />
               </div>
 
+              {/* PRODUCTS */}
+
               <div>
-                <label htmlFor="primary_services" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  Primary Services
+                <label className="mb-2 text-sm font-medium">
+                  Main Products Offered
                 </label>
+
                 <textarea
-                  id="primary_services"
-                  name="primary_services"
-                  required
-                  value={formData.primary_services}
-                  onChange={(e) => setFormData({ ...formData, primary_services: e.target.value })}
-                  placeholder="Describe your main products or services..."
-                  rows={4}
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="target_city" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  Target City
-                </label>
-                <input
-                  id="target_city"
-                  name="target_city"
-                  type="text"
-                  required
-                  value={formData.target_city}
-                  onChange={(e) => setFormData({ ...formData, target_city: e.target.value })}
-                  placeholder="e.g., New York, NY"
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="differentiation" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                  What makes you different?
-                </label>
-                <textarea
-                  id="differentiation"
-                  name="differentiation"
-                  value={formData.differentiation}
-                  onChange={(e) => setFormData({ ...formData, differentiation: e.target.value })}
-                  placeholder="What sets your business apart from competitors?"
                   rows={3}
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
+                  value={formData.products}
+                  onChange={(e)=>setFormData({...formData,products:e.target.value})}
+                  placeholder="Kosher cakes, Shabbat desserts, custom sweets..."
+                  className="w-full rounded-xl border border-input px-4 py-3"
                 />
               </div>
 
+              {/* TARGET CUSTOMERS */}
+
               <div>
-                <label htmlFor="certifications" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                  Certifications or Credentials
+                <label className="mb-2 text-sm font-medium">
+                  Target Customers
                 </label>
-                <input
-                  id="certifications"
-                  name="certifications"
-                  type="text"
-                  value={formData.certifications}
-                  onChange={(e) => setFormData({ ...formData, certifications: e.target.value })}
-                  placeholder="e.g., Board certified, Licensed, etc."
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+
+                <textarea
+                  rows={3}
+                  value={formData.target_customers}
+                  onChange={(e)=>setFormData({...formData,target_customers:e.target.value})}
+                  placeholder="Jewish community, families, events..."
+                  className="w-full rounded-xl border border-input px-4 py-3"
                 />
               </div>
 
+              {/* LOCATIONS */}
+
               <div>
-                <label htmlFor="google_business_link" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  Google Business Profile Link
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground"/>
+                  City & Neighborhoods Served
                 </label>
+
                 <input
-                  id="google_business_link"
-                  name="google_business_link"
+                  value={formData.locations}
+                  onChange={(e)=>setFormData({...formData,locations:e.target.value})}
+                  placeholder="São Paulo – Higienópolis, Bom Retiro"
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
+
+              {/* SERVICE TYPE */}
+
+              <div>
+                <label className="mb-2 text-sm font-medium">
+                  Service Type
+                </label>
+
+                <input
+                  value={formData.service_type}
+                  onChange={(e)=>setFormData({...formData,service_type:e.target.value})}
+                  placeholder="Delivery, pickup, catering..."
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
+
+              {/* KEYWORDS */}
+
+              <div>
+                <label className="mb-2 text-sm font-medium">
+                  Main Keywords Customers Search
+                </label>
+
+                <input
+                  value={formData.keywords}
+                  onChange={(e)=>setFormData({...formData,keywords:e.target.value})}
+                  placeholder="kosher desserts São Paulo"
+                  className="w-full rounded-xl border border-input px-4 py-3"
+                />
+              </div>
+
+              {/* GOOGLE BUSINESS */}
+
+              <div>
+                <label className="mb-2 text-sm font-medium">
+                  Google Business Profile
+                </label>
+
+                <input
                   type="url"
                   value={formData.google_business_link}
-                  onChange={(e) => setFormData({ ...formData, google_business_link: e.target.value })}
-                  placeholder="https://g.page/your-business"
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                  onChange={(e)=>setFormData({...formData,google_business_link:e.target.value})}
+                  placeholder="Google Maps listing link"
+                  className="w-full rounded-xl border border-input px-4 py-3"
                 />
               </div>
 
+              {/* INSTAGRAM */}
+
               <div>
-                <label htmlFor="content_presence" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  Current Content Presence
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <Instagram className="h-4 w-4 text-muted-foreground"/>
+                  Instagram
                 </label>
-                <textarea
-                  id="content_presence"
-                  name="content_presence"
-                  value={formData.content_presence}
-                  onChange={(e) => setFormData({ ...formData, content_presence: e.target.value })}
-                  placeholder="Do you have a blog, social media, videos, or other content?"
-                  rows={3}
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
+
+                <input
+                  value={formData.instagram}
+                  onChange={(e)=>setFormData({...formData,instagram:e.target.value})}
+                  placeholder="Instagram profile link"
+                  className="w-full rounded-xl border border-input px-4 py-3"
                 />
               </div>
 
+              {/* PHONE */}
+
               <div>
-                <label htmlFor="ai_association_goal" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                  Desired AI Association Goal
+                <label className="mb-2 text-sm font-medium flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground"/>
+                  Phone / WhatsApp
                 </label>
-                <textarea
-                  id="ai_association_goal"
-                  name="ai_association_goal"
-                  value={formData.ai_association_goal}
-                  onChange={(e) => setFormData({ ...formData, ai_association_goal: e.target.value })}
-                  placeholder="How do you want AI to describe or recommend your business?"
-                  rows={3}
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 resize-none"
+
+                <input
+                  value={formData.phone}
+                  onChange={(e)=>setFormData({...formData,phone:e.target.value})}
+                  placeholder="+55..."
+                  className="w-full rounded-xl border border-input px-4 py-3"
                 />
               </div>
+
+              {/* SUBMIT BUTTON */}
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100"
+                className="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground hover:scale-[1.02]"
               >
-                {submitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                    Submitting...
-                  </span>
-                ) : (
-                  'Submit Onboarding Form'
-                )}
+                {submitting ? "Submitting..." : "Submit Onboarding Form"}
               </button>
+
             </form>
+
           </div>
+
         </div>
+
       </main>
+
       <SiteFooter content={en} />
+
     </div>
   )
 }
@@ -283,4 +344,3 @@ export default function OnboardingPage() {
     </Suspense>
   )
 }
-
